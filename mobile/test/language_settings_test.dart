@@ -35,7 +35,10 @@ void main() {
       ),
     ));
 
-    await tester.tap(find.text('मराठी (Marathi)'));
+    final marathiOption = find.text('मराठी (Marathi)');
+    await tester.ensureVisible(marathiOption);
+    await tester.pumpAndSettle();
+    await tester.tap(marathiOption);
     await tester.pumpAndSettle();
 
     final preferences = await SharedPreferences.getInstance();

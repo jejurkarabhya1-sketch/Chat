@@ -23,7 +23,10 @@ void main() {
     expect(find.text('2.0 KB'), findsOneWidget);
     expect(find.text('3'), findsOneWidget);
 
-    await tester.tap(find.text('Reset counters'));
+    final resetButton = find.text('Reset counters');
+    await tester.ensureVisible(resetButton);
+    await tester.pumpAndSettle();
+    await tester.tap(resetButton);
     await tester.pumpAndSettle();
 
     final usage = await Api.trafficUsage();
@@ -37,8 +40,10 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: StorageDataScreen()));
     await tester.pumpAndSettle();
 
-    final switchFinder = find.byType(SwitchListTile);
+    final switchFinder = find.byKey(const ValueKey('dataSaverSwitch'));
     expect(switchFinder, findsOneWidget);
+    await tester.ensureVisible(switchFinder);
+    await tester.pumpAndSettle();
     await tester.tap(switchFinder);
     await tester.pumpAndSettle();
 

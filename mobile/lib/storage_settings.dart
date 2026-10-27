@@ -279,6 +279,7 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
               title: tr(context, 'data_saver'),
               subtitle: tr(context, 'data_saver_note'),
               child: SwitchListTile.adaptive(
+                key: const ValueKey('dataSaverSwitch'),
                 contentPadding: EdgeInsets.zero,
                 value: dataSaver,
                 onChanged: _setDataSaver,

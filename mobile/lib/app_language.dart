@@ -155,7 +155,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                 ),
                 const SizedBox(width: 14),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(tr(context, 'language_title'), style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
+                  Text(tr(context, 'language'), style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 5),
                   Text(tr(context, 'language_description'), style: const TextStyle(color: Color(0xFFD8EEE5), height: 1.4)),
                 ])),
