@@ -305,13 +305,16 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
   Widget _sectionCard({required String title, required String subtitle, required Widget child}) => Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, color: _ink)),
-          const SizedBox(height: 6),
-          Text(subtitle, style: const TextStyle(color: _muted, height: 1.45, fontSize: 12)),
-          const SizedBox(height: 10),
-          child,
-        ]),
+        child: Material(
+          color: Colors.transparent,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w800, color: _ink)),
+            const SizedBox(height: 6),
+            Text(subtitle, style: const TextStyle(color: _muted, height: 1.45, fontSize: 12)),
+            const SizedBox(height: 10),
+            child,
+          ]),
+        ),
       );
 
   Widget _usageRow(String label, String value, IconData icon) => Padding(
