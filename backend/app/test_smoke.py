@@ -45,18 +45,18 @@ def test_flutter_web_phone_auth_uses_web_confirmation_flow():
     assert "webConfirmationResult!.confirm(code.text.trim())" in source
 
 
-def test_client_build_workflow_checks_both_targets():
+def test_client_build_workflow_checks_web_target_without_android_apk():
     workflow = (ROOT.parent / ".github" / "workflows" / "build-clients.yml").read_text()
     assert "flutter analyze" in workflow
     assert "flutter test" in workflow
     assert "flutter build web --release" in workflow
-    assert "flutter build apk --release" in workflow
-    assert "Configure Android compile SDK" in workflow
-    assert "androidExtension.compileSdk = 36" in workflow
-    assert "afterEvaluate" not in workflow
-    assert "androidComponents.finalizeDsl" in workflow
-    assert 'sdkmanager" "platforms;android-36"' in workflow
+    assert "flutter build apk" not in workflow
+    assert "Build Android APK release" not in workflow
+    assert "Install Android API 36" not in workflow
     assert "actions/upload-artifact@v4" in workflow
+    pages_workflow = (ROOT.parent / ".github" / "workflows" / "deploy-web-pages.yml").read_text()
+    assert "actions/deploy-pages@v4" in pages_workflow
+    assert "flutter build web --release" in pages_workflow
 
 
 def test_production_is_blocked_until_audited_e2ee_exists():

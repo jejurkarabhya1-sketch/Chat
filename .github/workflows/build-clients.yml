@@ -38,7 +38,7 @@ jobs:
         run: python -m pytest app -q
 
   flutter-builds:
-    name: Flutter web and Android builds
+    name: Flutter web build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,49 +53,9 @@ jobs:
         run: flutter --version
       - name: Generate missing platform scaffolding
         run: |
-          if [ ! -d android ] || [ ! -d web ]; then
-            flutter create --platforms=android,web --project-name=veyra_messenger .
+          if [ ! -d web ]; then
+            flutter create --platforms=web --project-name=veyra_messenger .
           fi
-      - name: Install Android API 36
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36"
-      - name: Configure Android compile SDK
-        run: |
-          python3 - <<'PYCODE'
-          from pathlib import Path
-
-          android = Path("android")
-          build_file = next(
-              (path for path in (android / "build.gradle", android / "build.gradle.kts") if path.is_file()),
-              None,
-          )
-          if build_file is None:
-              raise SystemExit("Generated Android project has no root Gradle build file.")
-
-          sdk_script = android / "compile-sdk.gradle"
-          sdk_script.write_text(
-              "allprojects { project ->\n"
-              "    def configureAndroidSdk = {\n"
-              "        def androidComponents = project.extensions.findByName('androidComponents')\n"
-              "        if (androidComponents == null) {\n"
-              "            throw new GradleException('Android Components extension is unavailable for ' + project.path)\n"
-              "        }\n"
-              "        androidComponents.finalizeDsl { androidExtension ->\n"
-              "            androidExtension.compileSdk = 36\n"
-              "        }\n"
-              "    }\n"
-              "    project.plugins.withId('com.android.application') { configureAndroidSdk() }\n"
-              "    project.plugins.withId('com.android.library') { configureAndroidSdk() }\n"
-              "}\n"
-          )
-
-          build_text = build_file.read_text()
-          apply_statement = (
-              'apply(from = "compile-sdk.gradle")'
-              if build_file.name.endswith(".kts")
-              else 'apply from: "compile-sdk.gradle"'
-          )
-          if apply_statement not in build_text:
-              build_file.write_text(f"{build_text.rstrip()}\n\n{apply_statement}\n")
       - name: Resolve dependencies
         run: flutter pub get
       - name: Analyze Dart code
@@ -148,31 +108,10 @@ jobs:
             --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
             --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" \
             --dart-define=FIREBASE_WEB_VAPID_KEY="$FIREBASE_WEB_VAPID_KEY"
-      - name: Build Android APK release
-        env:
-          API_BASE_URL: ${{ vars.API_BASE_URL }}
-          FIREBASE_ANDROID_API_KEY: ${{ vars.FIREBASE_ANDROID_API_KEY }}
-          FIREBASE_ANDROID_APP_ID: ${{ vars.FIREBASE_ANDROID_APP_ID }}
-          FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
-          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
-        run: |
-          flutter build apk --release \
-            --dart-define=API_BASE_URL="$API_BASE_URL" \
-            --dart-define=FIREBASE_ANDROID_API_KEY="$FIREBASE_ANDROID_API_KEY" \
-            --dart-define=FIREBASE_ANDROID_APP_ID="$FIREBASE_ANDROID_APP_ID" \
-            --dart-define=FIREBASE_MESSAGING_SENDER_ID="$FIREBASE_MESSAGING_SENDER_ID" \
-            --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID"
       - name: Upload web bundle
         uses: actions/upload-artifact@v4
         with:
           name: veyra-web-${{ github.sha }}
           path: mobile/build/web/
-          if-no-files-found: error
-          retention-days: 14
-      - name: Upload Android APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: veyra-android-apk-${{ github.sha }}
-          path: mobile/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 14
