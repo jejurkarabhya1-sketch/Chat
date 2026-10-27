@@ -18,7 +18,7 @@ flutter create --platforms=android,web --project-name=veyra_messenger .
 flutter pub get
 ```
 
-The web CI workflows generate `mobile/web/` when it is missing. Android APK builds are temporarily disabled in CI while their compile SDK issue is being resolved; the web build and GitHub Pages deployment remain enabled.
+The web CI workflows generate Flutter's web scaffold when `mobile/web/index.html` is missing. Android APK builds are temporarily disabled in CI while their compile SDK issue is being resolved; the web build and GitHub Pages deployment remain enabled.
 
 ## 3. Validate in the same order as CI
 

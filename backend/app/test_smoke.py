@@ -53,10 +53,12 @@ def test_client_build_workflow_checks_web_target_without_android_apk():
     assert "flutter build apk" not in workflow
     assert "Build Android APK release" not in workflow
     assert "Install Android API 36" not in workflow
+    assert "if [ ! -f web/index.html ]" in workflow
     assert "actions/upload-artifact@v4" in workflow
     pages_workflow = (ROOT.parent / ".github" / "workflows" / "deploy-web-pages.yml").read_text()
     assert "actions/deploy-pages@v4" in pages_workflow
     assert "flutter build web --release" in pages_workflow
+    assert "if [ ! -f web/index.html ]" in pages_workflow
 
 
 def test_production_is_blocked_until_audited_e2ee_exists():

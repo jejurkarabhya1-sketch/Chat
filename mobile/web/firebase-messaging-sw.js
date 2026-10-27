@@ -11,8 +11,10 @@ firebase.initializeApp({
   apiKey: 'AIzaSyCRFq0XCTDOG_oikRqqGM6DB2fSp9VHMwg',
   authDomain: 'chat-70649.firebaseapp.com',
   projectId: 'chat-70649',
+  storageBucket: 'chat-70649.firebasestorage.app',
   messagingSenderId: '885470479377',
-  appId: '1:885470479377:web:dbe3f4818aa21ef04a9db0'
+  appId: '1:885470479377:web:dbe3f4818aa21ef04a9db0',
+  measurementId: 'G-Z868PZXSPW'
 });
 
 const messaging = firebase.messaging();

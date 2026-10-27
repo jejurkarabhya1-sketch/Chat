@@ -53,7 +53,7 @@ jobs:
         run: flutter --version
       - name: Generate missing platform scaffolding
         run: |
-          if [ ! -d web ]; then
+          if [ ! -f web/index.html ]; then
             flutter create --platforms=web --project-name=veyra_messenger .
           fi
       - name: Resolve dependencies
