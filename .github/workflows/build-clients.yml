@@ -72,12 +72,12 @@ jobs:
           sdk_script = android / "compile-sdk.gradle"
           sdk_script.write_text(
               "allprojects {\n"
-              "    afterEvaluate { project ->\n"
+              "    def configureAndroidSdk = {\n"
               "        def androidExtension = project.extensions.findByName('android')\n"
-              "        if (androidExtension != null) {\n"
-              "            androidExtension.compileSdkVersion(36)\n"
-              "        }\n"
+              "        androidExtension.compileSdkVersion(36)\n"
               "    }\n"
+              "    project.plugins.withId('com.android.application') { configureAndroidSdk() }\n"
+              "    project.plugins.withId('com.android.library') { configureAndroidSdk() }\n"
               "}\n"
           )
 
