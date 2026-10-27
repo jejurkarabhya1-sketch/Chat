@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:veyra_messenger/app_language.dart';
@@ -14,6 +15,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(
       locale: Locale('en'),
       supportedLocales: [Locale('en'), Locale('mr'), Locale('hi')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       home: LanguageSettingsScreen(),
     ));
 
@@ -31,6 +33,7 @@ void main() {
       builder: (context, locale, _) => MaterialApp(
         locale: locale ?? const Locale('en'),
         supportedLocales: const [Locale('en'), Locale('mr'), Locale('hi')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         home: const LanguageSettingsScreen(),
       ),
     ));

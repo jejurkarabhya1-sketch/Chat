@@ -218,9 +218,11 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: _canvas,
         appBar: AppBar(title: Text(tr(context, 'storage'))),
-        body: ListView(
+        body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          children: [
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(color: _relayGreen, borderRadius: BorderRadius.circular(22)),
@@ -298,15 +300,17 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
                 Expanded(child: Text(tr(context, 'storage_notice'), style: const TextStyle(color: _ink, height: 1.4, fontSize: 12))),
               ]),
             ),
-          ],
+            ],
+          ),
         ),
       );
 
-  Widget _sectionCard({required String title, required String subtitle, required Widget child}) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
-        child: Material(
-          color: Colors.transparent,
+  Widget _sectionCard({required String title, required String subtitle, required Widget child}) => Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(fontWeight: FontWeight.w800, color: _ink)),
             const SizedBox(height: 6),

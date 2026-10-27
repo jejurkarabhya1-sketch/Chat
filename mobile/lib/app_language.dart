@@ -164,8 +164,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             const SizedBox(height: 20),
             Text(tr(context, 'language_title').toUpperCase(), style: const TextStyle(color: Color(0xFF7B8983), fontSize: 11, letterSpacing: 1.1, fontWeight: FontWeight.w800)),
             const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            Material(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              clipBehavior: Clip.antiAlias,
               child: RadioGroup<String>(
                 groupValue: selectedCode,
                 onChanged: (value) {
