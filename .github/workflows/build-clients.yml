@@ -56,6 +56,8 @@ jobs:
           if [ ! -d android ] || [ ! -d web ]; then
             flutter create --platforms=android,web --project-name=veyra_messenger .
           fi
+      - name: Install Android API 36
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36"
       - name: Configure Android compile SDK
         run: |
           python3 - <<'PYCODE'
@@ -71,10 +73,15 @@ jobs:
 
           sdk_script = android / "compile-sdk.gradle"
           sdk_script.write_text(
-              "allprojects {\n"
+              "allprojects { project ->\n"
               "    def configureAndroidSdk = {\n"
-              "        def androidExtension = project.extensions.findByName('android')\n"
-              "        androidExtension.compileSdkVersion(36)\n"
+              "        def androidComponents = project.extensions.findByName('androidComponents')\n"
+              "        if (androidComponents == null) {\n"
+              "            throw new GradleException('Android Components extension is unavailable for ' + project.path)\n"
+              "        }\n"
+              "        androidComponents.finalizeDsl { androidExtension ->\n"
+              "            androidExtension.compileSdk = 36\n"
+              "        }\n"
               "    }\n"
               "    project.plugins.withId('com.android.application') { configureAndroidSdk() }\n"
               "    project.plugins.withId('com.android.library') { configureAndroidSdk() }\n"
