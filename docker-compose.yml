@@ -1,0 +1,48 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - veyra_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: relay
+      POSTGRES_USER: relay
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a strong POSTGRES_PASSWORD in .env}
+    volumes:
+      - relay_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U relay -d relay"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api:
+    build: ./backend
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      ALLOW_PLAINTEXT_MESSAGES: ${ALLOW_PLAINTEXT_MESSAGES:-false}
+      DATABASE_URL: postgresql+psycopg://relay:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/relay
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      ACCESS_TOKEN_MINUTES: 30
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:?Set FIREBASE_PROJECT_ID in .env}
+      REDIS_URL: redis://redis:6379/0
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-service-account.json
+    volumes:
+      - ${FIREBASE_SERVICE_ACCOUNT_FILE:?Set FIREBASE_SERVICE_ACCOUNT_FILE in .env}:/run/secrets/firebase-service-account.json:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+volumes:
+  veyra_redis:
+  relay_pg:

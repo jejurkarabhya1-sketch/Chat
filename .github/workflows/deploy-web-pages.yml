@@ -1,0 +1,78 @@
+name: Deploy Veyra web to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: veyra-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Validate deployment configuration
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+          FIREBASE_WEB_API_KEY: ${{ vars.FIREBASE_WEB_API_KEY }}
+          FIREBASE_WEB_APP_ID: ${{ vars.FIREBASE_WEB_APP_ID }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+        run: |
+          for key in API_BASE_URL FIREBASE_WEB_API_KEY FIREBASE_WEB_APP_ID FIREBASE_MESSAGING_SENDER_ID FIREBASE_PROJECT_ID FIREBASE_AUTH_DOMAIN; do
+            if [ -z "${!key}" ]; then echo "Missing repository variable: $key"; exit 1; fi
+          done
+          case "$API_BASE_URL" in https://*) ;; *) echo 'API_BASE_URL must use HTTPS for a deployed site.'; exit 1;; esac
+      - name: Generate missing platform scaffolding
+        run: |
+          if [ ! -d android ] || [ ! -d web ]; then
+            flutter create --platforms=android,web --project-name=veyra_messenger .
+          fi
+      - name: Resolve dependencies
+        run: flutter pub get
+      - name: Analyze and test
+        run: |
+          flutter analyze
+          flutter test
+      - name: Build web release
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+          FIREBASE_WEB_API_KEY: ${{ vars.FIREBASE_WEB_API_KEY }}
+          FIREBASE_WEB_APP_ID: ${{ vars.FIREBASE_WEB_APP_ID }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+        run: |
+          flutter build web --release --base-href "/${GITHUB_REPOSITORY#*/}/" \
+            --dart-define=API_BASE_URL="$API_BASE_URL" \
+            --dart-define=FIREBASE_WEB_API_KEY="$FIREBASE_WEB_API_KEY" \
+            --dart-define=FIREBASE_WEB_APP_ID="$FIREBASE_WEB_APP_ID" \
+            --dart-define=FIREBASE_MESSAGING_SENDER_ID="$FIREBASE_MESSAGING_SENDER_ID" \
+            --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
+            --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: mobile/build/web
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
