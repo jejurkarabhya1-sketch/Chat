@@ -8,11 +8,11 @@ importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: 'REPLACE_WITH_FIREBASE_WEB_API_KEY',
-  authDomain: 'REPLACE_WITH_FIREBASE_AUTH_DOMAIN',
-  projectId: 'REPLACE_WITH_FIREBASE_PROJECT_ID',
-  messagingSenderId: 'REPLACE_WITH_FIREBASE_MESSAGING_SENDER_ID',
-  appId: 'REPLACE_WITH_FIREBASE_WEB_APP_ID'
+  apiKey: 'AIzaSyCRFq0XCTDOG_oikRqqGM6DB2fSp9VHMwg',
+  authDomain: 'chat-70649.firebaseapp.com',
+  projectId: 'chat-70649',
+  messagingSenderId: '885470479377',
+  appId: '1:885470479377:web:dbe3f4818aa21ef04a9db0'
 });
 
 const messaging = firebase.messaging();

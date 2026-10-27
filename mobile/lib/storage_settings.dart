@@ -140,13 +140,16 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
   }
 
   Future<void> _createBackup() async {
+    final saveDialogTitle = tr(context, 'save_backup');
+    final backupCreatedLabel = tr(context, 'backup_created');
+    final backupFailedLabel = tr(context, 'backup_failed');
     final passphrase = await _askPassphrase(confirm: true);
     if (passphrase == null || !mounted) return;
     try {
       final bytes = await BackupService.createBackup(passphrase);
       final now = DateTime.now().toUtc().toIso8601String().replaceAll(':', '-').split('.').first;
       final saved = await FilePicker.platform.saveFile(
-        dialogTitle: tr(context, 'save_backup'),
+        dialogTitle: saveDialogTitle,
         fileName: 'veyra-backup-$now.veyra',
         type: FileType.custom,
         allowedExtensions: const ['veyra'],
@@ -154,29 +157,35 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
       );
       if (!mounted) return;
       if (saved != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr(context, 'backup_created'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(backupCreatedLabel)));
       }
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${tr(context, 'backup_failed')}: ${error.toString().replaceFirst('Exception: ', '')}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$backupFailedLabel: ${error.toString().replaceFirst('Exception: ', '')}')));
     }
   }
 
   Future<void> _restoreBackup() async {
+    final restoreTitle = tr(context, 'restore_backup');
+    final restoreWarning = tr(context, 'restore_backup_warning');
+    final cancelLabel = tr(context, 'cancel');
+    final chooseBackupTitle = tr(context, 'choose_backup');
+    final restoredMessage = tr(context, 'backup_restored');
+    final restoreFailedLabel = tr(context, 'restore_failed');
     final confirmation = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(tr(context, 'restore_backup')),
-        content: Text(tr(context, 'restore_backup_warning')),
+        title: Text(restoreTitle),
+        content: Text(restoreWarning),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(tr(context, 'cancel'))),
-          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(tr(context, 'restore_backup'))),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(cancelLabel)),
+          FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: Text(restoreTitle)),
         ],
       ),
     );
     if (confirmation != true || !mounted) return;
     final picked = await FilePicker.platform.pickFiles(
-      dialogTitle: tr(context, 'choose_backup'),
+      dialogTitle: chooseBackupTitle,
       type: FileType.custom,
       allowedExtensions: const ['veyra'],
       withData: true,
@@ -190,10 +199,11 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
       await loadSavedLocale();
       if (!mounted) return;
       await _load();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr(context, 'backup_restored'))));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(restoredMessage)));
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${tr(context, 'restore_failed')}: ${error.toString().replaceFirst('Exception: ', '')}')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$restoreFailedLabel: ${error.toString().replaceFirst('Exception: ', '')}')));
     }
   }
 
@@ -220,7 +230,7 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(tr(context, 'storage'), style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 5),
-                  Text(tr(context, 'storage_intro'), style: TextStyle(color: Color(0xFFD8EEE5), height: 1.4)),
+                  Text(tr(context, 'storage_intro'), style: const TextStyle(color: Color(0xFFD8EEE5), height: 1.4)),
                 ])),
               ]),
             ),
@@ -272,9 +282,9 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
                 contentPadding: EdgeInsets.zero,
                 value: dataSaver,
                 onChanged: _setDataSaver,
-                activeColor: _relayGreen,
-                title: Text(tr(context, 'enable_data_saver'), style: TextStyle(fontWeight: FontWeight.w700, color: _ink)),
-                subtitle: Text(tr(context, 'preference_saved'), style: TextStyle(color: _muted, fontSize: 12)),
+                activeThumbColor: _relayGreen,
+                title: Text(tr(context, 'enable_data_saver'), style: const TextStyle(fontWeight: FontWeight.w700, color: _ink)),
+                subtitle: Text(tr(context, 'preference_saved'), style: const TextStyle(color: _muted, fontSize: 12)),
               ),
             ),
             const SizedBox(height: 12),
@@ -284,7 +294,7 @@ class _StorageDataScreenState extends State<StorageDataScreen> {
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Icon(Icons.info_outline_rounded, color: _relayGreen),
                 const SizedBox(width: 10),
-                Expanded(child: Text(tr(context, 'storage_notice'), style: TextStyle(color: _ink, height: 1.4, fontSize: 12))),
+                Expanded(child: Text(tr(context, 'storage_notice'), style: const TextStyle(color: _ink, height: 1.4, fontSize: 12))),
               ]),
             ),
           ],

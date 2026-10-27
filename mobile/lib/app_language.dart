@@ -166,15 +166,20 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             const SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-              child: Column(children: [
-                _LanguageOption(code: 'system', title: tr(context, 'system_default'), subtitle: tr(context, 'system_description'), selectedCode: selectedCode, onSelected: _selectLanguage),
+              child: RadioGroup<String>(
+                groupValue: selectedCode,
+                onChanged: (value) {
+                  if (value != null) _selectLanguage(value);
+                },
+                child: Column(children: [
+                _LanguageOption(code: 'system', title: tr(context, 'system_default'), subtitle: tr(context, 'system_description')),
                 const Divider(height: 1, indent: 18, endIndent: 18),
-                _LanguageOption(code: 'en', title: tr(context, 'english'), subtitle: 'English', selectedCode: selectedCode, onSelected: _selectLanguage),
+                _LanguageOption(code: 'en', title: tr(context, 'english'), subtitle: 'English'),
                 const Divider(height: 1, indent: 18, endIndent: 18),
-                _LanguageOption(code: 'mr', title: tr(context, 'marathi'), subtitle: 'मराठी', selectedCode: selectedCode, onSelected: _selectLanguage),
+                _LanguageOption(code: 'mr', title: tr(context, 'marathi'), subtitle: 'मराठी'),
                 const Divider(height: 1, indent: 18, endIndent: 18),
-                _LanguageOption(code: 'hi', title: tr(context, 'hindi'), subtitle: 'हिन्दी', selectedCode: selectedCode, onSelected: _selectLanguage),
-              ]),
+                _LanguageOption(code: 'hi', title: tr(context, 'hindi'), subtitle: 'हिन्दी'),
+              ])),
             ),
             if (saving) const Padding(padding: EdgeInsets.only(top: 16), child: LinearProgressIndicator(color: Color(0xFF176B55))),
             const SizedBox(height: 18),
@@ -196,16 +201,11 @@ class _LanguageOption extends StatelessWidget {
   final String code;
   final String title;
   final String subtitle;
-  final String selectedCode;
-  final ValueChanged<String> onSelected;
-
-  const _LanguageOption({required this.code, required this.title, required this.subtitle, required this.selectedCode, required this.onSelected});
+  const _LanguageOption({required this.code, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) => RadioListTile<String>(
         value: code,
-        groupValue: selectedCode,
-        onChanged: (value) { if (value != null) onSelected(value); },
         activeColor: const Color(0xFF176B55),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         title: Text(title, style: const TextStyle(color: Color(0xFF17231F), fontWeight: FontWeight.w700, fontSize: 14)),
