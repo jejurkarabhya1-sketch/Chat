@@ -19,6 +19,7 @@ flutter pub get
 ```
 
 The CI workflows run this generation step automatically when either `mobile/android/` or `mobile/web/` is missing.
+The Android workflow configures compile SDK 36 for the app and Android plugin modules. This is separate from target SDK and minimum SDK and is required by current AndroidX plugin dependencies.
 
 ## 3. Validate in the same order as CI
 

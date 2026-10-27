@@ -56,6 +56,39 @@ jobs:
           if [ ! -d android ] || [ ! -d web ]; then
             flutter create --platforms=android,web --project-name=veyra_messenger .
           fi
+      - name: Configure Android compile SDK
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+
+          android = Path("android")
+          build_file = next(
+              (path for path in (android / "build.gradle", android / "build.gradle.kts") if path.is_file()),
+              None,
+          )
+          if build_file is None:
+              raise SystemExit("Generated Android project has no root Gradle build file.")
+
+          sdk_script = android / "compile-sdk.gradle"
+          sdk_script.write_text(
+              "allprojects {\n"
+              "    afterEvaluate { project ->\n"
+              "        def androidExtension = project.extensions.findByName('android')\n"
+              "        if (androidExtension != null) {\n"
+              "            androidExtension.compileSdkVersion(36)\n"
+              "        }\n"
+              "    }\n"
+              "}\n"
+          )
+
+          build_text = build_file.read_text()
+          apply_statement = (
+              'apply(from = "compile-sdk.gradle")'
+              if build_file.name.endswith(".kts")
+              else 'apply from: "compile-sdk.gradle"'
+          )
+          if apply_statement not in build_text:
+              build_file.write_text(f"{build_text.rstrip()}\n\n{apply_statement}\n")
       - name: Resolve dependencies
         run: flutter pub get
       - name: Analyze Dart code

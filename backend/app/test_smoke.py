@@ -51,6 +51,8 @@ def test_client_build_workflow_checks_both_targets():
     assert "flutter test" in workflow
     assert "flutter build web --release" in workflow
     assert "flutter build apk --release" in workflow
+    assert "Configure Android compile SDK" in workflow
+    assert "androidExtension.compileSdkVersion(36)" in workflow
     assert "actions/upload-artifact@v4" in workflow
 
 
